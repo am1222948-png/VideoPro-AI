@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#101426">
+<title>VideoPro AI - Creative Studio</title>
+<meta name="description" content="Personal AI Video Studio for cinematic videos, shorts, multilingual voiceovers and video creation.">
+
+<style>
+*{box-sizing:border-box}
+body{
+ margin:0;
+ background:#0c1120;
+ color:#f4f6ff;
+ font-family:Arial,sans-serif;
+}
+header{
+ padding:20px;
+ background:#151e34;
+ border-bottom:1px solid #293956;
+ display:flex;
+ justify-content:space-between;
+ align-items:center;
+}
+.logo{font-size:23px;font-weight:bold;color:#72baff}
+.logo span{color:#fff}
+.tag{font-size:11px;color:#9cabc5}
+main{max-width:950px;margin:auto;padding:18px}
+.welcome{margin:15px 0 22px}
+.welcome h1{font-size:25px;margin:0 0 8px}
+.welcome p{color:#aab7d0;font-size:14px}
+.panel{
+ background:#151e34;
+ border:1px solid #293956;
+ border-radius:15px;
+ padding:18px;
+ margin-bottom:17px;
+}
+.panel h2{font-size:18px;margin:0 0 16px}
+label{
+ display:block;
+ margin:14px 0 7px;
+ color:#cbd8ed;
+ font-size:13px;
+}
+textarea,select,input{
+ width:100%;
+ padding:13px;
+ background:#0d162a;
+ border:1px solid #344765;
+ border-radius:9px;
+ color:white;
+ font-size:14px;
+ outline:none;
+}
+textarea{min-height:120px;resize:vertical}
+textarea:focus,select:focus{
+ border-color:#58aaff;
+}
+.grid{
+ display:grid;
+ grid-template-columns:1fr 1fr;
+ gap:12px;
+}
+button{
+ padding:13px;
+ border:0;
+ border-radius:9px;
+ background:#2789ed;
+ color:white;
+ font-size:14px;
+ font-weight:bold;
+ cursor:pointer;
+}
+button:active{opacity:.8}
+.primary{width:100%;margin-top:19px;padding:16px;font-size:16px}
+.secondary{
+ background:#263653;
+ border:1px solid #405578;
+}
+.tabs{
+ display:grid;
+ grid-template-columns:1fr 1fr;
+ gap:10px;
+}
+.tabs button{background:#253653}
+.tabs button.active{background:#2789ed}
+.small{font-size:12px;color:#9cabc5;line-height:1.6}
+.status{
+ display:none;
+ margin-top:15px;
+ padding:14px;
+ background:#0c172a;
+ border:1px solid #344765;
+ border-radius:9px;
+ color:#8bc8ff;
+ font-size:13px;
+ line-height:1.6;
+}
+.preview{
+ min-height:150px;
+ border:1px dashed #435674;
+ border-radius:12px;
+ display:flex;
+ align-items:center;
+ justify-content:center;
+ text-align:center;
+ color:#8c9bb5;
+ padding:20px;
+ background:#0d162a;
+}
+footer{text-align:center;color:#7787a3;padding:25px;font-size:12px}
+@media(max-width:500px){
+ main{padding:12px}
+ .grid{gap:9px}
+ .panel{padding:15px}
+ .welcome h1{font-size:22px}
+}
+</style>
+</head>
+
+<body>
+
+<header>
+ <div>
+  <div class="logo">🎬 VideoPro <span>AI</span></div>
+  <div class="tag">PERSONAL AI VIDEO STUDIO</div>
+ </div>
+ <div>✨ Studio</div>
+</header>
+
+<main>
+
+<div class="welcome">
+ <h1>Create Amazing Videos with AI</h1>
+ <p>Turn your ideas into cinematic videos, documentaries and shorts.</p>
+</div>
+
+<section class="panel">
+ <h2>🎥 Video Creation Studio</h2>
+
+ <label>Choose Creation Mode</label>
+ <div class="tabs">
+  <button class="active" id="textTab" onclick="setMode('text')">✍️ Text to Video</button>
+  <button id="imageTab" onclick="setMode('image')">🖼️ Image to Video</button>
+ </div>
+
+ <div id="imageUpload" style="display:none">
+  <label>Upload Your Image</label>
+  <input type="file" id="imageFile" accept="image/*">
+ </div>
+
+ <label>Describe Your Video</label>
+ <textarea id="prompt" placeholder="Example: Create a realistic cinematic documentary about Saudi Arabia, its history, culture, beautiful deserts and modern cities."></textarea>
+
+ <div class="grid">
+  <div>
+   <label>Video Duration</label>
+   <select id="duration">
+    <option value="30">30 Seconds</option>
+    <option value="60">1 Minute</option>
+    <option value="180">3 Minutes</option>
+    <option value="300" selected>5 Minutes</option>
+    <option value="600">10 Minutes</option>
+   </select>
+  </div>
+
+  <div>
+   <label>Video Format</label>
+   <select id="format">
+    <option value="16:9">16:9 YouTube</option>
+    <option value="9:16">9:16 Shorts</option>
+   </select>
+  </div>
+
+  <div>
+   <label>Video Quality</label>
+   <select id="quality">
+    <option value="1080p" selected>1080p Full HD</option>
+    <option value="720p">720p HD</option>
+   </select>
+  </div>
+
+  <div>
+   <label>Visual Style</label>
+   <select id="style">
+    <option>Realistic Cinematic</option>
+    <option>Documentary</option>
+    <option>3D Animation</option>
+   </select>
+  </div>
+ </div>
+
+ <button class="primary" onclick="generatePlan()">🚀 Generate Video</button>
+ <div class="status" id="videoStatus"></div>
+</section>
+
+<section class="panel">
+ <h2>🎙️ AI Voice Over Studio</h2>
+
+ <label>Enter Your Voice Script</label>
+ <textarea id="voiceText" placeholder="Write or paste your narration here..."></textarea>
+
+ <div class="grid">
+  <div>
+   <label>Language</label>
+   <select id="voiceLanguage">
+    <option>English</option>
+    <option>Urdu</option>
+    <option>Arabic</option>
+    <option>Hindi</option>
+   </select>
+  </div>
+
+  <div>
+   <label>Voice Type</label>
+   <select id="voiceType">
+    <option>Male</option>
+    <option>Female</option>
+   </select>
+  </div>
+ </div>
+
+ <button class="primary" onclick="prepareVoice()">🎧 Generate Voice Over</button>
+ <div class="status" id="voiceStatus"></div>
+</section>
+
+<section class="panel">
+ <h2>📝 AI Script Studio</h2>
+
+ <label>Video Topic</label>
+ <input id="topic" placeholder="Enter your video topic">
+
+ <div class="grid">
+  <div>
+   <label>Script Language</label>
+   <select id="scriptLanguage">
+    <option>English</option>
+    <option>Urdu</option>
+    <option>Arabic</option>
+    <option>Hindi</option>
+   </select>
+  </div>
+
+  <div>
+   <label>Script Duration</label>
+   <select id="scriptDuration">
+    <option>1 Minute</option>
+    <option>5 Minutes</option>
+    <option>10 Minutes</option>
+   </select>
+  </div>
+ </div>
+
+ <button class="primary secondary" onclick="prepareScript()">✨ Prepare Script Request</button>
+ <div class="status" id="scriptStatus"></div>
+</section>
+
+<section class="panel">
+ <h2>🎞️ Video Preview</h2>
+ <div class="preview" id="preview">
+  <div>
+   <div style="font-size:35px">▶️</div>
+   <p>Your generated video will appear here.</p>
+  </div>
+ </div>
+ <p class="small">Final video preview and MP4 download will be activated after backend integration.</p>
+</section>
+
+<section class="panel">
+ <h2>⚙️ Studio Information</h2>
+ <p class="small">
+  Visual style: Realistic Cinematic<br>
+  Default voice: Male<br>
+  Languages: English, Urdu, Arabic and Hindi<br>
+  Output: 720p / 1080p<br>
+  Formats: YouTube and Shorts<br>
+  Duration: Up to 10 minutes
+ </p>
+</section>
+
+</main>
+
+<footer>
+VideoPro AI © 2026<br>
+Your Personal Creative Studio
+</footer>
+
+<script>
+let currentMode="text";
+
+function setMode(mode){
+ currentMode=mode;
+
+ document.getElementById("textTab").classList.toggle("active",mode==="text");
+ document.getElementById("imageTab").classList.toggle("active",mode==="image");
+
+ document.getElementById("imageUpload").style.display=
+ mode==="image"?"block":"none";
+}
+
+function showStatus(id,message){
+ const box=document.getElementById(id);
+ box.style.display="block";
+ box.textContent=message;
+}
+
+function generatePlan(){
+ const prompt=document.getElementById("prompt").value.trim();
+
+ if(!prompt){
+  alert("Please enter your video description.");
+  return;
+ }
+
+ if(currentMode==="image" &&
+ !document.getElementById("imageFile").files.length){
+  alert("Please upload an image first.");
+  return;
+ }
+
+ const settings={
+  mode:currentMode,
+  prompt:prompt,
+  duration:document.getElementById("duration").value,
+  format:document.getElementById("format").value,
+  quality:document.getElementById("quality").value,
+  style:document.getElementById("style").value
+ };
+
+ console.log("Video creation settings:",settings);
+
+ showStatus("videoStatus",
+ "Your video settings are ready! Backend and AI video generation service must now be connected. No video has been generated yet.");
+}
+
+function prepareVoice(){
+ const script=document.getElementById("voiceText").value.trim();
+
+ if(!script){
+  alert("Please enter your voice-over script.");
+  return;
+ }
+
+ const language=document.getElementById("voiceLanguage").value;
+ const voice=document.getElementById("voiceType").value;
+
+ console.log("Voice settings:",{script,language,voice});
+
+ showStatus("voiceStatus",
+ "Voice-over request prepared for "+language+" with "+voice+" voice. AI speech service is not connected yet.");
+}
+
+function prepareScript(){
+ const topic=document.getElementById("topic").value.trim();
+
+ if(!topic){
+  alert("Please enter a video topic.");
+  return;
+ }
+
+ const settings={
+  topic:topic,
+  language:document.getElementById("scriptLanguage").value,
+  duration:document.getElementById("scriptDuration").value
+ };
+
+ console.log("Script settings:",settings);
+
+ showStatus("scriptStatus",
+ "Script request prepared. AI script-writing service will be connected in the next development stage.");
+}
+</script>
+
+</body>
+</html>
