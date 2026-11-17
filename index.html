@@ -226,11 +226,13 @@ footer{text-align:center;color:#7787a3;padding:25px;font-size:12px}
  <div class="status" id="voiceStatus"></div>
 </section>
 
+
 <section class="panel">
  <h2>📝 AI Script Studio</h2>
+ <p class="small">Create detailed scripts and organize your video scenes.</p>
 
  <label>Video Topic</label>
- <input id="topic" placeholder="Enter your video topic">
+ <input id="topic" placeholder="Example: History of Saudi Arabia">
 
  <div class="grid">
   <div>
@@ -246,16 +248,49 @@ footer{text-align:center;color:#7787a3;padding:25px;font-size:12px}
   <div>
    <label>Script Duration</label>
    <select id="scriptDuration">
-    <option>1 Minute</option>
-    <option>5 Minutes</option>
-    <option>10 Minutes</option>
+    <option value="1">1 Minute</option>
+    <option value="5" selected>5 Minutes</option>
+    <option value="10">10 Minutes</option>
    </select>
   </div>
  </div>
 
- <button class="primary secondary" onclick="prepareScript()">✨ Prepare Script Request</button>
- <div class="status" id="scriptStatus"></div>
+ <label>Script Style</label>
+ <select id="scriptStyle">
+  <option>Realistic Documentary</option>
+  <option>Educational</option>
+  <option>Historical</option>
+  <option>Inspirational</option>
+  <option>Storytelling</option>
+ </select>
+
+ <button class="primary" onclick="prepareScript()">
+  ✨ Create AI Script Prompt
+ </button>
+
+ <div id="scriptStatus" class="status"></div>
+
+ <label>AI Script Prompt</label>
+ <textarea id="scriptPrompt" placeholder="Your detailed AI prompt will appear here..."></textarea>
+
+ <button class="secondary" style="width:100%;margin-top:10px"
+ onclick="copyScriptPrompt()">📋 Copy AI Prompt</button>
+
+ <label>Paste Your Generated Script Here</label>
+ <textarea id="finalScript" style="min-height:220px"
+ placeholder="Paste your completed script here..."></textarea>
+
+ <button class="primary" onclick="splitScenes()">
+  🎬 Divide Script Into Scenes
+ </button>
+
+ <button class="secondary" style="width:100%;margin-top:10px"
+ onclick="downloadScript()">⬇️ Download Script TXT</button>
+
+ <div id="sceneStatus" class="status"></div>
+ <div id="sceneResults"></div>
 </section>
+
 
 <section class="panel">
  <h2>🎞️ Video Preview</h2>
@@ -352,25 +387,145 @@ function prepareVoice(){
  "Voice-over request prepared for "+language+" with "+voice+" voice. AI speech service is not connected yet.");
 }
 
+
 function prepareScript(){
  const topic=document.getElementById("topic").value.trim();
+ const language=document.getElementById("scriptLanguage").value;
+ const duration=Number(document.getElementById("scriptDuration").value);
+ const style=document.getElementById("scriptStyle").value;
 
  if(!topic){
-  alert("Please enter a video topic.");
+  alert("Please enter your video topic.");
   return;
  }
 
- const settings={
-  topic:topic,
-  language:document.getElementById("scriptLanguage").value,
-  duration:document.getElementById("scriptDuration").value
+ const words={
+  1:130,
+  5:650,
+  10:1300
  };
 
- console.log("Script settings:",settings);
+ const scenes={
+  1:5,
+  5:12,
+  10:20
+ };
+
+ const prompt=`Act as a professional documentary script writer.
+
+Create a complete ${duration}-minute video script about:
+
+TOPIC: ${topic}
+
+LANGUAGE: ${language}
+STYLE: ${style}
+TARGET WORD COUNT: Approximately ${words[duration]} words.
+NUMBER OF SCENES: ${scenes[duration]}.
+
+IMPORTANT INSTRUCTIONS:
+
+1. Write the entire script in ${language}.
+2. Start with an interesting opening hook.
+3. Divide the script into ${scenes[duration]} numbered scenes.
+4. Give every scene a title.
+5. Write detailed narration for each scene.
+6. Give a realistic cinematic visual prompt for every scene.
+7. Include suitable transitions between scenes.
+8. Keep the narration natural and engaging.
+9. End with a strong conclusion.
+10. Provide a separate clean voice-over narration.
+11. Do not invent historical facts.
+12. Make the script suitable for a professional YouTube documentary.
+
+OUTPUT FORMAT:
+
+VIDEO TITLE:
+INTRODUCTION:
+SCENE 1:
+NARRATION:
+VISUAL PROMPT:
+
+Continue this format for all scenes.
+
+FINAL VOICE-OVER SCRIPT:
+Provide the complete narration without scene descriptions.`;
+
+ document.getElementById("scriptPrompt").value=prompt;
 
  showStatus("scriptStatus",
- "Script request prepared. AI script-writing service will be connected in the next development stage.");
+ "Your "+duration+"-minute script prompt is ready! Copy it and use ChatGPT to generate your complete script.");
 }
+
+async function copyScriptPrompt(){
+ const box=document.getElementById("scriptPrompt");
+
+ if(!box.value.trim()){
+  alert("Create your script prompt first.");
+  return;
+ }
+
+ try{
+  await navigator.clipboard.writeText(box.value);
+  showStatus("scriptStatus","AI prompt copied successfully!");
+ }catch(error){
+  box.focus();
+  box.select();
+  showStatus("scriptStatus","Prompt selected. Use Copy from your mobile keyboard.");
+ }
+}
+
+function splitScenes(){
+ const script=document.getElementById("finalScript").value.trim();
+
+ if(!script){
+  alert("Please paste your generated script first.");
+  return;
+ }
+
+ const paragraphs=script.split(/\n\s*\n/).filter(p=>p.trim());
+
+ const output=document.getElementById("sceneResults");
+ output.innerHTML="";
+
+ paragraphs.forEach((paragraph,index)=>{
+  const card=document.createElement("div");
+  card.className="panel";
+
+  const title=document.createElement("h3");
+  title.textContent="Scene / Section "+(index+1);
+
+  const content=document.createElement("p");
+  content.style.whiteSpace="pre-wrap";
+  content.textContent=paragraph;
+
+  card.appendChild(title);
+  card.appendChild(content);
+  output.appendChild(card);
+ });
+
+ showStatus("sceneStatus",
+ "Your script has been divided into "+paragraphs.length+" sections.");
+}
+
+function downloadScript(){
+ const script=document.getElementById("finalScript").value.trim();
+
+ if(!script){
+  alert("Please enter your script first.");
+  return;
+ }
+
+ const blob=new Blob([script],{type:"text/plain;charset=utf-8"});
+ const url=URL.createObjectURL(blob);
+ const link=document.createElement("a");
+
+ link.href=url;
+ link.download="VideoPro-AI-Script.txt";
+ link.click();
+
+ URL.revokeObjectURL(url);
+}
+
 </script>
 
 </body>
