@@ -474,29 +474,48 @@ async function copyScriptPrompt(){
  }
 }
 
+
 function splitScenes(){
- const script=document.getElementById("finalScript").value.trim();
+ const script = document.getElementById("finalScript").value.trim();
 
  if(!script){
   alert("Please paste your generated script first.");
   return;
  }
 
- const paragraphs=script.split(/\n\s*\n/).filter(p=>p.trim());
+ // Match only numbered scene headings
+ const scenePattern = /^\s*(?:#{1,6}\s*)?(?:\*\*)?SCENE\s+(\d+)\s*[:\-–—.]?\s*(?:\*\*)?.*$/gim;
 
- const output=document.getElementById("sceneResults");
- output.innerHTML="";
+ const matches = [...script.matchAll(scenePattern)];
 
- paragraphs.forEach((paragraph,index)=>{
-  const card=document.createElement("div");
-  card.className="panel";
+ const output = document.getElementById("sceneResults");
+ output.innerHTML = "";
 
-  const title=document.createElement("h3");
-  title.textContent="Scene / Section "+(index+1);
+ if(matches.length === 0){
+  showStatus("sceneStatus",
+   "No numbered SCENE headings found. Please check your script.");
+  return;
+ }
 
-  const content=document.createElement("p");
-  content.style.whiteSpace="pre-wrap";
-  content.textContent=paragraph;
+ const scenes = matches.map((match, index) => {
+  const start = match.index;
+  const end = index + 1 < matches.length
+   ? matches[index + 1].index
+   : script.length;
+
+  return script.substring(start, end).trim();
+ });
+
+ scenes.forEach((scene, index) => {
+  const card = document.createElement("div");
+  card.className = "panel";
+
+  const title = document.createElement("h3");
+  title.textContent = "Scene " + (index + 1);
+
+  const content = document.createElement("p");
+  content.style.whiteSpace = "pre-wrap";
+  content.textContent = scene;
 
   card.appendChild(title);
   card.appendChild(content);
@@ -504,8 +523,9 @@ function splitScenes(){
  });
 
  showStatus("sceneStatus",
- "Your script has been divided into "+paragraphs.length+" sections.");
+  "Your script has been divided into " + scenes.length + " scenes.");
 }
+
 
 function downloadScript(){
  const script=document.getElementById("finalScript").value.trim();
