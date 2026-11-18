@@ -475,6 +475,7 @@ async function copyScriptPrompt(){
 }
 
 
+
 function splitScenes(){
  const script = document.getElementById("finalScript").value.trim();
 
@@ -483,17 +484,20 @@ function splitScenes(){
   return;
  }
 
- // Match only numbered scene headings
- const scenePattern = /^\s*(?:#{1,6}\s*)?(?:\*\*)?SCENE\s+(\d+)\s*[:\-–—.]?\s*(?:\*\*)?.*$/gim;
+ const cleanText = text => text
+  .replace(/\\([#*_])/g, "$1")
+  .replace(/^#{1,6}\s*/gm, "")
+  .replace(/\*\*/g, "")
+  .trim();
 
+ const scenePattern = /^\s*(?:\\?#{1,6}\s*)?(?:\\?\*\*)?SCENE\s+(\d+)\s*[:\-–—.]?\s*(?:\\?\*\*)?.*$/gim;
  const matches = [...script.matchAll(scenePattern)];
 
  const output = document.getElementById("sceneResults");
  output.innerHTML = "";
 
  if(matches.length === 0){
-  showStatus("sceneStatus",
-   "No numbered SCENE headings found. Please check your script.");
+  showStatus("sceneStatus", "No numbered SCENE headings found.");
   return;
  }
 
@@ -507,18 +511,60 @@ function splitScenes(){
  });
 
  scenes.forEach((scene, index) => {
+  const heading = scene.match(/SCENE\s+\d+\s*[:\-–—.]?\s*(.*)/i);
+  const narrationMatch = scene.match(/NARRATION\s*:\s*([\s\S]*?)(?=VISUAL PROMPT\s*:|TRANSITION\s*:|$)/i);
+  const visualMatch = scene.match(/VISUAL PROMPT\s*:\s*([\s\S]*?)(?=TRANSITION\s*:|$)/i);
+  const transitionMatch = scene.match(/TRANSITION\s*:\s*([\s\S]*?)$/i);
+
   const card = document.createElement("div");
   card.className = "panel";
 
   const title = document.createElement("h3");
-  title.textContent = "Scene " + (index + 1);
-
-  const content = document.createElement("p");
-  content.style.whiteSpace = "pre-wrap";
-  content.textContent = scene;
+  title.textContent = "Scene " + (index + 1) +
+   (heading && heading[1] ? ": " + cleanText(heading[1]) : "");
 
   card.appendChild(title);
-  card.appendChild(content);
+
+  function addSection(label, value){
+   if(!value) return;
+
+   const sectionTitle = document.createElement("h4");
+   sectionTitle.textContent = label;
+
+   const content = document.createElement("div");
+   content.className = "panel";
+   content.style.whiteSpace = "pre-wrap";
+   content.textContent = cleanText(value);
+
+   card.appendChild(sectionTitle);
+   card.appendChild(content);
+
+   return content;
+  }
+
+  addSection("NARRATION", narrationMatch && narrationMatch[1]);
+
+  const visualBox = addSection("VISUAL PROMPT", visualMatch && visualMatch[1]);
+
+  if(visualBox){
+   const copyButton = document.createElement("button");
+   copyButton.textContent = "📋 Copy Visual Prompt";
+   copyButton.type = "button";
+
+   copyButton.onclick = async () => {
+    try{
+     await navigator.clipboard.writeText(visualBox.textContent);
+     copyButton.textContent = "✓ Copied!";
+    }catch(error){
+     alert("Copy failed. Please select and copy the prompt manually.");
+    }
+   };
+
+   card.appendChild(copyButton);
+  }
+
+  addSection("TRANSITION", transitionMatch && transitionMatch[1]);
+
   output.appendChild(card);
  });
 
