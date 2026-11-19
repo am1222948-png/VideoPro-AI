@@ -561,6 +561,17 @@ function splitScenes(){
    };
 
    card.appendChild(copyButton);
+   const imageButton = document.createElement("button");
+imageButton.textContent = "🖼️ Open Image Creator";
+imageButton.className = "secondary";
+imageButton.style.width = "100%";
+imageButton.style.marginTop = "10px";
+
+imageButton.onclick = () => {
+  window.open("https://www.bing.com/images/create", "_blank");
+};
+
+card.appendChild(imageButton);
   }
 
   addSection("TRANSITION", transitionMatch && transitionMatch[1]);
