@@ -474,7 +474,64 @@ async function copyScriptPrompt(){
  }
 }
 
+// VideoPro AI - Permanent Scene Image Storage
+const SCENE_DB_NAME = "VideoProSceneImages";
+const SCENE_STORE_NAME = "images";
 
+function openSceneDB(){
+  return new Promise((resolve, reject) => {
+    const request = indexedDB.open(SCENE_DB_NAME, 1);
+
+    request.onupgradeneeded = () => {
+      const db = request.result;
+      if(!db.objectStoreNames.contains(SCENE_STORE_NAME)){
+        db.createObjectStore(SCENE_STORE_NAME);
+      }
+    };
+
+    request.onsuccess = () => resolve(request.result);
+    request.onerror = () => reject(request.error);
+  });
+}
+
+async function saveSceneImage(sceneId, file){
+  const db = await openSceneDB();
+
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(SCENE_STORE_NAME, "readwrite");
+    tx.objectStore(SCENE_STORE_NAME).put(file, sceneId);
+
+    tx.oncomplete = () => {
+      db.close();
+      resolve(true);
+    };
+
+    tx.onerror = () => {
+      db.close();
+      reject(tx.error);
+    };
+  });
+}
+
+async function getSceneImage(sceneId){
+  const db = await openSceneDB();
+
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(SCENE_STORE_NAME, "readonly");
+    const request = tx.objectStore(SCENE_STORE_NAME).get(sceneId);
+
+    request.onsuccess = () => {
+      const result = request.result || null;
+      db.close();
+      resolve(result);
+    };
+
+    request.onerror = () => {
+      db.close();
+      reject(request.error);
+    };
+  });
+}
 
 function splitScenes(){
  const script = document.getElementById("finalScript").value.trim();
@@ -584,17 +641,36 @@ sceneImageInput.style.display = "none";
 const imagePreview = document.createElement("img");
 imagePreview.style.cssText = "width:100%;border-radius:12px;margin-top:12px;display:none;";
 
-sceneImageInput.onchange = () => {
+const sceneStorageId = "VideoProScene-" + (index + 1);
+
+sceneImageInput.onchange = async () => {
   const file = sceneImageInput.files[0];
   if (!file) return;
 
-  imagePreview.src = URL.createObjectURL(file);
-  imagePreview.style.display = "block";
+  try {
+    await saveSceneImage(sceneStorageId, file);
+
+    imagePreview.src = URL.createObjectURL(file);
+    imagePreview.style.display = "block";
+
+    showStatus("sceneStatus",
+      "Scene " + (index + 1) + " image saved successfully!");
+  } catch(error) {
+    alert("Image could not be saved. Your browser storage may be full.");
+  }
 };
 
 uploadLabel.appendChild(sceneImageInput);
 card.appendChild(uploadLabel);
 card.appendChild(imagePreview);
+   getSceneImage(sceneStorageId).then(savedImage => {
+  if(savedImage){
+    imagePreview.src = URL.createObjectURL(savedImage);
+    imagePreview.style.display = "block";
+  }
+}).catch(error => {
+  console.log("Saved scene image could not be loaded:", error);
+});
   }
 
   addSection("TRANSITION", transitionMatch && transitionMatch[1]);
