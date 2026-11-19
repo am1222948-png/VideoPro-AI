@@ -572,6 +572,29 @@ imageButton.onclick = () => {
 };
 
 card.appendChild(imageButton);
+   const uploadLabel = document.createElement("label");
+uploadLabel.textContent = "📥 Upload Generated Image";
+uploadLabel.style.cssText = "display:block;background:#263653;padding:13px;border-radius:9px;text-align:center;margin-top:10px;cursor:pointer;font-weight:bold;";
+
+const sceneImageInput = document.createElement("input");
+sceneImageInput.type = "file";
+sceneImageInput.accept = "image/*";
+sceneImageInput.style.display = "none";
+
+const imagePreview = document.createElement("img");
+imagePreview.style.cssText = "width:100%;border-radius:12px;margin-top:12px;display:none;";
+
+sceneImageInput.onchange = () => {
+  const file = sceneImageInput.files[0];
+  if (!file) return;
+
+  imagePreview.src = URL.createObjectURL(file);
+  imagePreview.style.display = "block";
+};
+
+uploadLabel.appendChild(sceneImageInput);
+card.appendChild(uploadLabel);
+card.appendChild(imagePreview);
   }
 
   addSection("TRANSITION", transitionMatch && transitionMatch[1]);
