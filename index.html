@@ -656,7 +656,8 @@ sceneImageInput.onchange = async () => {
 
     imagePreview.src = URL.createObjectURL(file);
     imagePreview.style.display = "block";
-
+timelineThumb.src = imagePreview.src;
+timelineThumb.style.display = "block";
     showStatus("sceneStatus",
       "Scene " + (index + 1) + " image saved successfully!");
   } catch(error) {
@@ -667,6 +668,26 @@ sceneImageInput.onchange = async () => {
 uploadLabel.appendChild(sceneImageInput);
 card.appendChild(uploadLabel);
 card.appendChild(imagePreview);
+   // Timeline thumbnail card
+const timelineCard = document.createElement("div");
+timelineCard.style.cssText =
+  "background:#151e34;border:1px solid #293956;border-radius:10px;padding:8px;text-align:center;";
+
+const timelineThumb = document.createElement("img");
+timelineThumb.style.cssText =
+  "width:100%;aspect-ratio:16/9;object-fit:cover;border-radius:7px;display:none;";
+
+const timelineTitle = document.createElement("div");
+timelineTitle.textContent = "Scene " + (index + 1);
+timelineTitle.style.cssText =
+  "font-size:12px;font-weight:bold;margin-top:7px;color:#72baff;";
+
+timelineCard.appendChild(timelineThumb);
+timelineCard.appendChild(timelineTitle);
+
+if(timeline){
+  timeline.appendChild(timelineCard);
+}
    getSceneImage(sceneStorageId).then(savedImage => {
   if(savedImage){
     imagePreview.src = URL.createObjectURL(savedImage);
