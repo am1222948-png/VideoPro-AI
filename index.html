@@ -688,7 +688,23 @@ timelineCard.style.cssText =
 const timelineThumb = document.createElement("img");
 timelineThumb.style.cssText =
   "width:100%;aspect-ratio:16/9;object-fit:cover;border-radius:7px;display:none;";
+// Scene duration control
+const durationLabel = document.createElement("label");
+durationLabel.textContent = "Duration (seconds)";
+durationLabel.style.cssText =
+  "display:block;font-size:12px;color:#a9b8d0;margin-top:8px;";
 
+const durationInput = document.createElement("input");
+durationInput.type = "number";
+durationInput.min = "1";
+durationInput.value = "5";
+durationInput.style.cssText =
+  "width:100%;padding:8px;border-radius:8px;margin-top:5px;";
+
+durationInput.dataset.sceneDuration = "true";
+
+durationLabel.appendChild(durationInput);
+timelineCard.appendChild(durationLabel);
 const timelineTitle = document.createElement("div");
 timelineTitle.textContent = "Scene " + (index + 1);
 timelineTitle.style.cssText =
