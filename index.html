@@ -555,7 +555,8 @@ function splitScenes(){
 
  const output = document.getElementById("sceneResults");
  output.innerHTML = "";
-
+const timeline = document.getElementById("sceneTimeline");
+if(timeline) timeline.innerHTML = "";
  if(matches.length === 0){
   showStatus("sceneStatus", "No numbered SCENE headings found.");
   return;
