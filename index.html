@@ -569,6 +569,17 @@ if (!totalDurationBox) {
 }
 
 totalDurationBox.textContent = "⏱️ Total Video Duration: 0 seconds";
+ function updateSceneTotalDuration() {
+  const inputs = timeline.querySelectorAll("[data-scene-duration]");
+  let total = 0;
+
+  inputs.forEach(input => {
+    total += Math.max(0, Number(input.value) || 0);
+  });
+
+  totalDurationBox.textContent =
+    "⏱️ Total Video Duration: " + total + " seconds";
+}
  if(matches.length === 0){
   showStatus("sceneStatus", "No numbered SCENE headings found.");
   return;
@@ -702,7 +713,7 @@ durationInput.style.cssText =
   "width:100%;padding:8px;border-radius:8px;margin-top:5px;";
 
 durationInput.dataset.sceneDuration = "true";
-
+durationInput.addEventListener("input", updateSceneTotalDuration);
 durationLabel.appendChild(durationInput);
 timelineCard.appendChild(durationLabel);
 const timelineTitle = document.createElement("div");
@@ -730,7 +741,7 @@ if(timeline){
 
   output.appendChild(card);
  });
-
+updateSceneTotalDuration();
  showStatus("sceneStatus",
   "Your script has been divided into " + scenes.length + " scenes.");
 }
