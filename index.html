@@ -557,6 +557,18 @@ function splitScenes(){
  output.innerHTML = "";
 const timeline = document.getElementById("sceneTimeline");
 if(timeline) timeline.innerHTML = "";
+ let totalDurationBox = document.getElementById("sceneTotalDuration");
+
+if (!totalDurationBox) {
+  totalDurationBox = document.createElement("div");
+  totalDurationBox.id = "sceneTotalDuration";
+  totalDurationBox.style.cssText =
+    "background:#102b46;border:1px solid #3584ca;padding:14px;border-radius:12px;margin:12px 0;color:#fff;font-size:17px;font-weight:bold;text-align:center;";
+
+  timeline.parentNode.insertBefore(totalDurationBox, timeline);
+}
+
+totalDurationBox.textContent = "⏱️ Total Video Duration: 0 seconds";
  if(matches.length === 0){
   showStatus("sceneStatus", "No numbered SCENE headings found.");
   return;
