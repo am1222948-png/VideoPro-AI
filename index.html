@@ -612,6 +612,17 @@ const sceneCards = [];
 
   timeline.innerHTML = "";
   timelineCards.forEach(card => timeline.appendChild(card));
+  timelineCards.forEach((card, index) => {
+  const buttons = card.querySelectorAll("button");
+
+  if(buttons.length >= 2){
+    buttons[0].disabled = index === 0;
+    buttons[1].disabled = index === timelineCards.length - 1;
+
+    buttons[0].style.opacity = buttons[0].disabled ? "0.35" : "1";
+    buttons[1].style.opacity = buttons[1].disabled ? "0.35" : "1";
+  }
+});
 }
  scenes.forEach((scene, index) => {
   const heading = scene.match(/SCENE\s+\d+\s*[:\-–—.]?\s*(.*)/i);
@@ -769,6 +780,11 @@ downButton.onclick = () => {
 moveButtons.appendChild(upButton);
 moveButtons.appendChild(downButton);
 timelineCard.appendChild(moveButtons);
+   upButton.disabled = index === 0;
+downButton.disabled = index === scenes.length - 1;
+
+upButton.style.opacity = upButton.disabled ? "0.35" : "1";
+downButton.style.opacity = downButton.disabled ? "0.35" : "1";
 if(timeline){
   timeline.appendChild(timelineCard);
 }
