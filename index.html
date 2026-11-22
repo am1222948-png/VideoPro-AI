@@ -593,7 +593,8 @@ totalDurationBox.textContent = "⏱️ Total Video Duration: 0 seconds";
 
   return script.substring(start, end).trim();
  });
-
+const timelineCards = [];
+const sceneCards = [];
  scenes.forEach((scene, index) => {
   const heading = scene.match(/SCENE\s+\d+\s*[:\-–—.]?\s*(.*)/i);
   const narrationMatch = scene.match(/NARRATION\s*:\s*([\s\S]*?)(?=VISUAL PROMPT\s*:|TRANSITION\s*:|$)/i);
