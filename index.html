@@ -603,7 +603,7 @@ const sceneCards = [];
 
   const card = document.createElement("div");
   card.className = "panel";
-
+sceneCards.push(card);
   const title = document.createElement("h3");
   title.textContent = "Scene " + (index + 1) +
    (heading && heading[1] ? ": " + cleanText(heading[1]) : "");
