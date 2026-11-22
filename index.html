@@ -612,6 +612,21 @@ const sceneCards = [];
 
   timeline.innerHTML = "";
   timelineCards.forEach(card => timeline.appendChild(card));
+  sceneCards.forEach((card, index) => {
+  const sceneTitle = card.querySelector("[data-scene-title]");
+  const timelineTitle = timelineCards[index].querySelector("[data-scene-title]");
+
+  if(sceneTitle){
+    sceneTitle.textContent = sceneTitle.textContent.replace(
+      /^Scene \d+/,
+      "Scene " + (index + 1)
+    );
+  }
+
+  if(timelineTitle){
+    timelineTitle.textContent = "Scene " + (index + 1);
+  }
+});
   timelineCards.forEach((card, index) => {
   const buttons = card.querySelectorAll("button");
 
@@ -636,7 +651,7 @@ sceneCards.push(card);
   const title = document.createElement("h3");
   title.textContent = "Scene " + (index + 1) +
    (heading && heading[1] ? ": " + cleanText(heading[1]) : "");
-
+title.dataset.sceneTitle = "true";
   card.appendChild(title);
 
   function addSection(label, value){
@@ -749,6 +764,7 @@ durationLabel.appendChild(durationInput);
 timelineCard.appendChild(durationLabel);
 const timelineTitle = document.createElement("div");
 timelineTitle.textContent = "Scene " + (index + 1);
+   timelineTitle.dataset.sceneTitle = "true";
 timelineTitle.style.cssText =
   "font-size:12px;font-weight:bold;margin-top:7px;color:#72baff;";
 
