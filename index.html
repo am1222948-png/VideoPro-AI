@@ -595,6 +595,24 @@ totalDurationBox.textContent = "⏱️ Total Video Duration: 0 seconds";
  });
 const timelineCards = [];
 const sceneCards = [];
+ function moveScene(from, to) {
+  if (to < 0 || to >= sceneCards.length) return;
+
+  const scene = sceneCards.splice(from, 1)[0];
+  sceneCards.splice(to, 0, scene);
+
+  const timelineCard = timelineCards.splice(from, 1)[0];
+  timelineCards.splice(to, 0, timelineCard);
+
+  const output = document.getElementById("sceneResults");
+  const timeline = document.getElementById("sceneTimeline");
+
+  output.innerHTML = "";
+  sceneCards.forEach(card => output.appendChild(card));
+
+  timeline.innerHTML = "";
+  timelineCards.forEach(card => timeline.appendChild(card));
+}
  scenes.forEach((scene, index) => {
   const heading = scene.match(/SCENE\s+\d+\s*[:\-–—.]?\s*(.*)/i);
   const narrationMatch = scene.match(/NARRATION\s*:\s*([\s\S]*?)(?=VISUAL PROMPT\s*:|TRANSITION\s*:|$)/i);
@@ -725,7 +743,32 @@ timelineTitle.style.cssText =
 
 timelineCard.appendChild(timelineThumb);
 timelineCard.appendChild(timelineTitle);
+const moveButtons = document.createElement("div");
+moveButtons.style.cssText = "display:flex;gap:5px;margin-top:8px;";
 
+const upButton = document.createElement("button");
+upButton.textContent = "⬆️";
+upButton.className = "secondary";
+upButton.style.flex = "1";
+
+upButton.onclick = () => {
+  const currentIndex = timelineCards.indexOf(timelineCard);
+  moveScene(currentIndex, currentIndex - 1);
+};
+
+const downButton = document.createElement("button");
+downButton.textContent = "⬇️";
+downButton.className = "secondary";
+downButton.style.flex = "1";
+
+downButton.onclick = () => {
+  const currentIndex = timelineCards.indexOf(timelineCard);
+  moveScene(currentIndex, currentIndex + 1);
+};
+
+moveButtons.appendChild(upButton);
+moveButtons.appendChild(downButton);
+timelineCard.appendChild(moveButtons);
 if(timeline){
   timeline.appendChild(timelineCard);
 }
