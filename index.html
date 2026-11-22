@@ -595,6 +595,8 @@ totalDurationBox.textContent = "⏱️ Total Video Duration: 0 seconds";
  });
 const timelineCards = [];
 const sceneCards = [];
+ const originalSceneCards = [];
+const originalTimelineCards = [];
  function moveScene(from, to) {
   if (to < 0 || to >= sceneCards.length) return;
 
@@ -639,6 +641,18 @@ const sceneCards = [];
   }
 });
 }
+ const resetOrderButton = document.createElement("button");
+resetOrderButton.textContent = "🔄 Reset Scene Order";
+resetOrderButton.className = "secondary";
+resetOrderButton.style.cssText = "width:100%;margin:10px 0;";
+
+resetOrderButton.onclick = () => {
+  sceneCards.splice(0, sceneCards.length, ...originalSceneCards);
+  timelineCards.splice(0, timelineCards.length, ...originalTimelineCards);
+  moveScene(0, 0);
+};
+
+timeline.parentNode.insertBefore(resetOrderButton, timeline);
  scenes.forEach((scene, index) => {
   const heading = scene.match(/SCENE\s+\d+\s*[:\-–—.]?\s*(.*)/i);
   const narrationMatch = scene.match(/NARRATION\s*:\s*([\s\S]*?)(?=VISUAL PROMPT\s*:|TRANSITION\s*:|$)/i);
@@ -818,6 +832,8 @@ if(timeline){
 
   output.appendChild(card);
  });
+ originalSceneCards.push(...sceneCards);
+originalTimelineCards.push(...timelineCards);
 updateSceneTotalDuration();
  showStatus("sceneStatus",
   "Your script has been divided into " + scenes.length + " scenes.");
