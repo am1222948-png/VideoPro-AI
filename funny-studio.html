@@ -197,12 +197,48 @@ body {
         <option value="anime">Anime Style</option>
         <option value="comic">Comic Style</option>
       </select>
-
+<label for="storyCharacter">Choose Your Character</label>
+<select id="storyCharacter">
+  <option value="">No character selected</option>
+</select>
       <button id="generateStoryBtn" class="generate-button">
         ✨ Generate Funny Story
       </button>
 
     </section>
+
+<section class="studio-panel" id="characterCreator">
+
+  <h2>🎭 Cartoon Character Creator</h2>
+  <p>Create your own character for funny and cartoon videos.</p>
+
+  <label for="characterName">Character Name</label>
+  <input type="text" id="characterName" placeholder="Example: Chotu">
+
+  <label for="characterAppearance">Character Appearance</label>
+  <textarea id="characterAppearance" rows="3"
+    placeholder="Example: Short cartoon man, round face, orange shirt, big eyes"></textarea>
+
+  <label for="characterPersonality">Personality</label>
+  <textarea id="characterPersonality" rows="2"
+    placeholder="Example: Lazy, funny, always making silly excuses"></textarea>
+
+  <label for="characterVoice">Character Voice</label>
+  <select id="characterVoice">
+    <option value="Funny energetic voice">Funny & Energetic</option>
+    <option value="Slow sleepy voice">Slow & Sleepy</option>
+    <option value="High pitched cartoon voice">High-Pitched Cartoon</option>
+    <option value="Deep comic voice">Deep Comic Voice</option>
+    <option value="Normal friendly voice">Friendly Voice</option>
+  </select>
+
+  <button type="button" class="generate-button" id="saveCharacterBtn">
+    💾 Save Character
+  </button>
+
+  <div id="characterPreview" style="margin-top:15px;"></div>
+
+</section>
 
     <section class="story-output" id="storyOutput">
 
@@ -347,6 +383,130 @@ card.appendChild(imageCreatorBtn);
   });
 
 });
+</script>
+  <script>
+const saveCharacterBtn = document.getElementById("saveCharacterBtn");
+
+saveCharacterBtn.addEventListener("click", function () {
+
+  const name = document.getElementById("characterName").value.trim();
+  const appearance = document.getElementById("characterAppearance").value.trim();
+  const personality = document.getElementById("characterPersonality").value.trim();
+  const voice = document.getElementById("characterVoice").value;
+
+  if (!name || !appearance || !personality) {
+    alert("Please fill in all character details.");
+    return;
+  }
+
+  const character = {
+    id: Date.now(),
+    name: name,
+    appearance: appearance,
+    personality: personality,
+    voice: voice
+  };
+
+  let characters = JSON.parse(localStorage.getItem("funnyCharacters") || "[]");
+
+  characters.push(character);
+
+  localStorage.setItem("funnyCharacters", JSON.stringify(characters));
+
+  showSavedCharacters();
+function loadCharacterOptions() {
+
+  const dropdown = document.getElementById("storyCharacter");
+  const characters = JSON.parse(localStorage.getItem("funnyCharacters") || "[]");
+
+  dropdown.innerHTML = "";
+
+  const defaultOption = document.createElement("option");
+  defaultOption.value = "";
+  defaultOption.textContent = "No character selected";
+  dropdown.appendChild(defaultOption);
+
+  characters.forEach(function(character) {
+
+    const option = document.createElement("option");
+    option.value = character.id;
+    option.textContent = character.name;
+
+    dropdown.appendChild(option);
+
+  });
+
+}
+
+loadCharacterOptions();
+  document.getElementById("characterName").value = "";
+  document.getElementById("characterAppearance").value = "";
+  document.getElementById("characterPersonality").value = "";
+
+  alert("Character saved successfully!");
+
+});
+
+function showSavedCharacters() {
+
+  const preview = document.getElementById("characterPreview");
+
+  const characters = JSON.parse(localStorage.getItem("funnyCharacters") || "[]");
+
+  preview.innerHTML = "";
+
+  if (characters.length === 0) {
+    preview.textContent = "No saved characters yet.";
+    return;
+  }
+
+  const heading = document.createElement("h3");
+  heading.textContent = "📚 Your Saved Characters";
+  preview.appendChild(heading);
+
+  characters.forEach(function(character) {
+
+    const card = document.createElement("div");
+
+    card.style.cssText =
+      "background:#0e1628;padding:15px;margin:12px 0;border:1px solid #35425e;border-radius:12px;";
+
+    const name = document.createElement("h3");
+    name.textContent = "🎭 " + character.name;
+
+    const appearance = document.createElement("p");
+    appearance.textContent = "Appearance: " + character.appearance;
+
+    const personality = document.createElement("p");
+    personality.textContent = "Personality: " + character.personality;
+
+    const voice = document.createElement("p");
+    voice.textContent = "Voice: " + character.voice;
+
+    const deleteBtn = document.createElement("button");
+    deleteBtn.textContent = "🗑️ Delete Character";
+    deleteBtn.className = "generate-button";
+    deleteBtn.style.background = "#b83245";
+
+    deleteBtn.onclick = function() {
+      const updated = characters.filter(c => c.id !== character.id);
+      localStorage.setItem("funnyCharacters", JSON.stringify(updated));
+      showSavedCharacters();
+    };
+
+    card.appendChild(name);
+    card.appendChild(appearance);
+    card.appendChild(personality);
+    card.appendChild(voice);
+    card.appendChild(deleteBtn);
+
+    preview.appendChild(card);
+
+  });
+
+}
+
+showSavedCharacters();
 </script>
 </body>
 </html>
