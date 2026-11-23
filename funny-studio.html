@@ -264,7 +264,15 @@ generateBtn.addEventListener("click", function () {
   const language = document.getElementById("storyLanguage").value;
   const duration = Number(document.getElementById("videoLength").value);
   const style = document.getElementById("cartoonStyle").value;
+const characterId = document.getElementById("storyCharacter").value;
 
+const savedCharacters = JSON.parse(
+  localStorage.getItem("funnyCharacters") || "[]"
+);
+
+const selectedCharacter = savedCharacters.find(
+  character => String(character.id) === characterId
+);
   if (!topic) {
     storyResult.textContent = "Please enter a video topic first.";
     return;
@@ -343,12 +351,23 @@ generateBtn.addEventListener("click", function () {
     const narration = document.createElement("p");
     narration.textContent = scene;
 
-    const prompt = document.createElement("p");
-    prompt.textContent =
-      "Visual Prompt: " + topic +
-      ", " + style +
-      ", funny expressions, colorful animation, cinematic scene " +
-      (index + 1);
+ const prompt = document.createElement("p");
+
+const characterDetails = selectedCharacter
+  ? "Main character: " + selectedCharacter.name +
+    ". Appearance: " + selectedCharacter.appearance +
+    ". Personality: " + selectedCharacter.personality +
+    ". Keep the character's appearance, clothes, face and design consistent in every scene. "
+  : "";
+
+prompt.textContent =
+  "Visual Prompt: " +
+  topic +
+  ". " +
+  characterDetails +
+  style +
+  ", funny expressions, colorful animation, cinematic scene " +
+  (index + 1);
 
     card.appendChild(heading);
     card.appendChild(narration);
@@ -507,6 +526,25 @@ function showSavedCharacters() {
 }
 
 showSavedCharacters();
+</script>
+  <script>
+function loadCharactersOnPageOpen() {
+  const dropdown = document.getElementById("storyCharacter");
+  const characters = JSON.parse(
+    localStorage.getItem("funnyCharacters") || "[]"
+  );
+
+  dropdown.innerHTML = '<option value="">No character selected</option>';
+
+  characters.forEach(function(character) {
+    const option = document.createElement("option");
+    option.value = String(character.id);
+    option.textContent = character.name;
+    dropdown.appendChild(option);
+  });
+}
+
+loadCharactersOnPageOpen();
 </script>
 </body>
 </html>
