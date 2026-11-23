@@ -332,6 +332,17 @@ copyBtn.onclick = async () => {
 };
 
 card.appendChild(copyBtn);
+    const imageCreatorBtn = document.createElement("button");
+imageCreatorBtn.textContent = "🎨 Open Image Creator";
+imageCreatorBtn.className = "generate-button";
+imageCreatorBtn.style.cssText =
+  "margin-top:8px;background:linear-gradient(135deg,#0e9f6e,#087fbd);";
+
+imageCreatorBtn.onclick = () => {
+  window.open("https://www.bing.com/images/create", "_blank");
+};
+
+card.appendChild(imageCreatorBtn);
     storyResult.appendChild(card);
   });
 
