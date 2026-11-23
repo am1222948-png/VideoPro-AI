@@ -239,7 +239,18 @@ body {
   <div id="characterPreview" style="margin-top:15px;"></div>
 
 </section>
-
+<div id="totalVideoDuration" style="
+  background:#202b43;
+  padding:15px;
+  margin-bottom:18px;
+  border-radius:12px;
+  border:1px solid #35425e;
+  font-size:18px;
+  font-weight:bold;
+  text-align:center;
+">
+  ⏱️ Total Video Duration: 0 seconds
+</div>
     <section class="story-output" id="storyOutput">
 
       <h2>📖 Your Story</h2>
@@ -317,6 +328,29 @@ async function getFunnySceneImage(key) {
       reject(request.error);
     };
   });
+}
+  function updateTotalVideoDuration() {
+  const durationSelectors = document.querySelectorAll(
+    "#storyResult select[data-scene-duration]"
+  );
+
+  let totalSeconds = 0;
+
+  durationSelectors.forEach(function(select) {
+    totalSeconds += Number(select.value) || 0;
+  });
+
+  const display = document.getElementById("totalVideoDuration");
+
+  if (display) {
+    const minutes = Math.floor(totalSeconds / 60);
+    const seconds = totalSeconds % 60;
+
+    display.textContent =
+      "⏱️ Total Video Duration: " +
+      (minutes > 0 ? minutes + " min " : "") +
+      seconds + " seconds";
+  }
 }
 generateBtn.addEventListener("click", function () {
 
@@ -443,6 +477,29 @@ prompt.textContent =
   (index + 1);
 
     card.appendChild(heading);
+    const durationLabel = document.createElement("label");
+durationLabel.textContent = "⏱️ Scene Duration";
+
+durationLabel.style.cssText =
+  "display:block;margin-top:15px;font-weight:bold;color:#dbe5f5;";
+
+const durationSelect = document.createElement("select");
+durationSelect.setAttribute("data-scene-duration", "true");
+
+durationSelect.addEventListener("change", updateTotalVideoDuration);
+durationSelect.style.cssText =
+  "width:100%;padding:12px;margin-top:8px;background:#0e1628;color:white;border:1px solid #35425e;border-radius:10px;";
+
+[3, 5, 8, 10, 15, 20].forEach(function(seconds) {
+  const option = document.createElement("option");
+  option.value = seconds;
+  option.textContent = seconds + " seconds";
+  if (seconds === 5) option.selected = true;
+  durationSelect.appendChild(option);
+});
+
+card.appendChild(durationLabel);
+card.appendChild(durationSelect);
     card.appendChild(narration);
     card.appendChild(prompt);
     const sceneImageLabel = document.createElement("label");
@@ -533,7 +590,7 @@ imageCreatorBtn.onclick = () => {
 card.appendChild(imageCreatorBtn);
     storyResult.appendChild(card);
   });
-
+updateTotalVideoDuration();
 });
 </script>
   <script>
