@@ -256,7 +256,68 @@ body {
 <script>
 const generateBtn = document.getElementById("generateStoryBtn");
 const storyResult = document.getElementById("storyResult");
+function openFunnyImageDB() {
+  return new Promise(function(resolve, reject) {
+    const request = indexedDB.open("FunnyStudioImages", 1);
 
+    request.onupgradeneeded = function() {
+      const db = request.result;
+      if (!db.objectStoreNames.contains("sceneImages")) {
+        db.createObjectStore("sceneImages", { keyPath: "key" });
+      }
+    };
+
+    request.onsuccess = function() {
+      resolve(request.result);
+    };
+
+    request.onerror = function() {
+      reject(request.error);
+    };
+  });
+}
+
+async function saveFunnySceneImage(key, imageData) {
+  const db = await openFunnyImageDB();
+
+  return new Promise(function(resolve, reject) {
+    const transaction = db.transaction("sceneImages", "readwrite");
+    transaction.objectStore("sceneImages").put({
+      key: key,
+      image: imageData
+    });
+
+    transaction.oncomplete = function() {
+      db.close();
+      resolve();
+    };
+
+    transaction.onerror = function() {
+      db.close();
+      reject(transaction.error);
+    };
+  });
+}
+
+async function getFunnySceneImage(key) {
+  const db = await openFunnyImageDB();
+
+  return new Promise(function(resolve, reject) {
+    const transaction = db.transaction("sceneImages", "readonly");
+    const request = transaction.objectStore("sceneImages").get(key);
+
+    request.onsuccess = function() {
+      const result = request.result;
+      db.close();
+      resolve(result ? result.image : null);
+    };
+
+    request.onerror = function() {
+      db.close();
+      reject(request.error);
+    };
+  });
+}
 generateBtn.addEventListener("click", function () {
 
   const topic = document.getElementById("storyTopic").value.trim();
@@ -354,10 +415,20 @@ const selectedCharacter = savedCharacters.find(
  const prompt = document.createElement("p");
 
 const characterDetails = selectedCharacter
-  ? "Main character: " + selectedCharacter.name +
-    ". Appearance: " + selectedCharacter.appearance +
-    ". Personality: " + selectedCharacter.personality +
-    ". Keep the character's appearance, clothes, face and design consistent in every scene. "
+  ? `
+CHARACTER CONSISTENCY LOCK:
+Character name: ${selectedCharacter.name}.
+Fixed appearance: ${selectedCharacter.appearance}.
+Personality: ${selectedCharacter.personality}.
+Voice style: ${selectedCharacter.voice}.
+
+IMPORTANT:
+Keep exactly the same face, clothes, colors, hairstyle,
+body design and character identity in every scene.
+Do not redesign or change the character.
+Only change pose, facial expression and action
+according to the scene.
+`
   : "";
 
 prompt.textContent =
@@ -365,13 +436,75 @@ prompt.textContent =
   topic +
   ". " +
   characterDetails +
+  "Visual style: " +
   style +
-  ", funny expressions, colorful animation, cinematic scene " +
+  ". Funny expressions, colorful animation, cinematic lighting, " +
+  "high quality scene " +
   (index + 1);
 
     card.appendChild(heading);
     card.appendChild(narration);
     card.appendChild(prompt);
+    const sceneImageLabel = document.createElement("label");
+sceneImageLabel.textContent = "🖼️ Upload Scene Image";
+sceneImageLabel.style.cssText =
+  "display:block;margin-top:15px;padding:12px;background:#263653;border-radius:10px;cursor:pointer;";
+
+const sceneImageInput = document.createElement("input");
+sceneImageInput.type = "file";
+sceneImageInput.accept = "image/*";
+sceneImageInput.style.display = "none";
+
+const sceneImagePreview = document.createElement("img");
+sceneImagePreview.style.cssText =
+  "width:100%;max-width:400px;margin-top:12px;border-radius:12px;display:none;";
+
+const sceneImageKey = topic + "::scene-" + (index + 1);
+
+sceneImageInput.onchange = async function() {
+  const file = sceneImageInput.files[0];
+  if (!file) return;
+
+  const reader = new FileReader();
+
+  reader.onload = async function() {
+    const imageData = reader.result;
+
+    sceneImagePreview.src = imageData;
+    sceneImagePreview.style.display = "block";
+
+    try {
+      await saveFunnySceneImage(sceneImageKey, imageData);
+      sceneImageLabel.textContent = "✅ Image Saved - Scene " + (index + 1);
+    } catch (error) {
+      sceneImageLabel.textContent = "⚠️ Image preview loaded, save failed";
+      console.error(error);
+    }
+  };
+
+  reader.readAsDataURL(file);
+};
+
+// Load previously saved image for this scene
+getFunnySceneImage(sceneImageKey)
+  .then(function(savedImage) {
+    if (savedImage) {
+      sceneImagePreview.src = savedImage;
+      sceneImagePreview.style.display = "block";
+      sceneImageLabel.textContent = "✅ Saved Image - Scene " + (index + 1);
+    }
+  })
+  .catch(function(error) {
+    console.error("Image loading error:", error);
+  });
+
+sceneImageLabel.onclick = function() {
+  sceneImageInput.click();
+};
+
+card.appendChild(sceneImageLabel);
+card.appendChild(sceneImageInput);
+card.appendChild(sceneImagePreview);
 const copyBtn = document.createElement("button");
 copyBtn.textContent = "📋 Copy Visual Prompt";
 copyBtn.className = "generate-button";
