@@ -317,7 +317,21 @@ generateBtn.addEventListener("click", function () {
     card.appendChild(heading);
     card.appendChild(narration);
     card.appendChild(prompt);
+const copyBtn = document.createElement("button");
+copyBtn.textContent = "📋 Copy Visual Prompt";
+copyBtn.className = "generate-button";
+copyBtn.style.marginTop = "10px";
 
+copyBtn.onclick = async () => {
+  try {
+    await navigator.clipboard.writeText(prompt.textContent);
+    copyBtn.textContent = "✅ Copied!";
+  } catch (error) {
+    copyBtn.textContent = "Copy failed";
+  }
+};
+
+card.appendChild(copyBtn);
     storyResult.appendChild(card);
   });
 
