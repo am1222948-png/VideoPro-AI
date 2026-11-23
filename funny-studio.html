@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Funny & Cartoon Studio | VideoPro AI</title>
+
+  <style>
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: #0b1020;
+  color: #f1f5f9;
+}
+
+.studio-header {
+  padding: 24px 16px;
+  text-align: center;
+  background: linear-gradient(135deg, #151e38, #25204a);
+  border-bottom: 1px solid #343d59;
+}
+
+.studio-header h1 {
+  margin: 22px 0 10px;
+  font-size: 28px;
+  color: #ffffff;
+}
+
+.studio-header p {
+  color: #b8c3d9;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.back-button {
+  display: inline-block;
+  text-decoration: none;
+  color: #cbd5e1;
+  background: #202b43;
+  padding: 10px 15px;
+  border-radius: 10px;
+  font-size: 14px;
+}
+
+.funny-studio {
+  max-width: 850px;
+  margin: 22px auto;
+  padding: 0 14px 30px;
+}
+
+.studio-panel,
+.story-output {
+  background: #151d30;
+  border: 1px solid #293650;
+  border-radius: 18px;
+  padding: 20px;
+  margin-bottom: 20px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.18);
+}
+
+.studio-panel h2,
+.story-output h2 {
+  margin-top: 0;
+  margin-bottom: 22px;
+  font-size: 20px;
+}
+
+.studio-panel label {
+  display: block;
+  margin: 18px 0 8px;
+  font-size: 14px;
+  font-weight: bold;
+  color: #dbe5f5;
+}
+
+.studio-panel input,
+.studio-panel select,
+.studio-panel textarea {
+  display: block;
+  width: 100%;
+  padding: 13px;
+  background: #0e1628;
+  color: #f1f5f9;
+  border: 1px solid #35425e;
+  border-radius: 10px;
+  font-size: 15px;
+  outline: none;
+}
+
+.studio-panel textarea {
+  resize: vertical;
+  min-height: 100px;
+  line-height: 1.6;
+}
+
+.studio-panel select:focus,
+.studio-panel textarea:focus {
+  border-color: #818cf8;
+  box-shadow: 0 0 0 2px rgba(129, 140, 248, 0.15);
+}
+
+.generate-button {
+  width: 100%;
+  padding: 15px;
+  margin-top: 24px;
+  border: none;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #6658ee, #a34bea);
+  color: white;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.generate-button:active {
+  transform: scale(0.98);
+}
+
+.story-output {
+  min-height: 180px;
+}
+
+#storyResult {
+  background: #0e1628;
+  border: 1px dashed #35425e;
+  border-radius: 12px;
+  padding: 16px;
+  color: #b8c3d9;
+  line-height: 1.7;
+  overflow-wrap: anywhere;
+}
+
+@media (min-width: 700px) {
+  .funny-studio {
+    padding: 0 20px 40px;
+  }
+
+  .studio-panel,
+  .story-output {
+    padding: 26px;
+  }
+}
+</style>
+</head>
+<body>
+
+  <header class="studio-header">
+    <a href="index.html" class="back-button">← Back to VideoPro AI</a>
+    <h1>Funny & Cartoon Studio</h1>
+    <p>Create funny stories, cartoon characters and comedy videos.</p>
+  </header>
+
+  <main class="funny-studio">
+
+    <section class="studio-panel">
+
+      <h2>🎬 Create a New Video</h2>
+
+      <label for="videoType">Video Type</label>
+      <select id="videoType">
+        <option value="funny">😂 Funny Comedy</option>
+        <option value="cartoon">🎭 Cartoon Story</option>
+        <option value="animal">🐵 Funny Animals</option>
+      </select>
+
+      <label for="storyTopic">Video Topic</label>
+      <textarea
+        id="storyTopic"
+        placeholder="Example: A lazy driver gets caught by his boss..."
+        rows="4"
+      ></textarea>
+
+      <label for="storyLanguage">Story Language</label>
+      <select id="storyLanguage">
+        <option value="english">English</option>
+        <option value="urdu">Urdu</option>
+        <option value="roman-urdu">Roman Urdu</option>
+      </select>
+
+      <label for="videoLength">Video Duration</label>
+      <select id="videoLength">
+        <option value="30">30 Seconds</option>
+        <option value="60">1 Minute</option>
+        <option value="120">2 Minutes</option>
+        <option value="180">3 Minutes</option>
+        <option value="300" selected>5 Minutes</option>
+      </select>
+
+      <label for="cartoonStyle">Visual Style</label>
+      <select id="cartoonStyle">
+        <option value="3d-cartoon">3D Cartoon</option>
+        <option value="2d-cartoon">2D Cartoon</option>
+        <option value="anime">Anime Style</option>
+        <option value="comic">Comic Style</option>
+      </select>
+
+      <button id="generateStoryBtn" class="generate-button">
+        ✨ Generate Funny Story
+      </button>
+
+    </section>
+
+    <section class="story-output" id="storyOutput">
+
+      <h2>📖 Your Story</h2>
+
+      <div id="storyResult">
+        <p>Your generated story will appear here.</p>
+      </div>
+
+    </section>
+
+  </main>
+
+  <script src="funny-studio.js"></script>
+<script>
+const generateBtn = document.getElementById("generateStoryBtn");
+const storyResult = document.getElementById("storyResult");
+
+generateBtn.addEventListener("click", function () {
+
+  const topic = document.getElementById("storyTopic").value.trim();
+  const type = document.getElementById("videoType").value;
+  const language = document.getElementById("storyLanguage").value;
+  const duration = Number(document.getElementById("videoLength").value);
+  const style = document.getElementById("cartoonStyle").value;
+
+  if (!topic) {
+    storyResult.textContent = "Please enter a video topic first.";
+    return;
+  }
+
+  let scenesCount = Math.max(3, Math.ceil(duration / 30));
+
+  const funnyScenes = [
+    "The hero makes a very confident plan, but immediately forgets what it was.",
+    "A small problem suddenly turns into a huge comedy disaster.",
+    "The hero tries to act smart, but everyone notices the silly mistake.",
+    "A friend arrives and makes the situation even more confusing.",
+    "Everyone argues over the funniest possible solution.",
+    "The hero finally solves the problem in the most unexpected way.",
+    "Just when everyone thinks it is over, another funny surprise happens.",
+    "The characters look at each other and burst into laughter."
+  ];
+
+  const cartoonScenes = [
+    "Introduce the main character in a colorful cartoon world.",
+    "The character discovers a strange and surprising problem.",
+    "A funny side character appears with a crazy idea.",
+    "The characters try to solve the problem with a silly plan.",
+    "Their plan creates an unexpected cartoon disaster.",
+    "Everyone works together to fix the mess.",
+    "A surprising twist changes everything.",
+    "End with a funny visual gag and a happy moment."
+  ];
+
+  const animalScenes = [
+    "A funny animal wakes up and has a very unusual idea.",
+    "The animal tries to impress its friends.",
+    "Something unexpected goes completely wrong.",
+    "The animal blames a nearby friend in a silly way.",
+    "All the animals join the confusing adventure.",
+    "The animal makes one last ridiculous attempt.",
+    "The problem gets solved by pure accident.",
+    "The animals celebrate with a funny dance."
+  ];
+
+  let scenes;
+
+  if (type === "cartoon") {
+    scenes = cartoonScenes;
+  } else if (type === "animal") {
+    scenes = animalScenes;
+  } else {
+    scenes = funnyScenes;
+  }
+
+  const selectedScenes = [];
+
+  for (let i = 0; i < scenesCount; i++) {
+    selectedScenes.push(scenes[i % scenes.length]);
+  }
+
+  storyResult.innerHTML = "";
+
+  const title = document.createElement("h3");
+  title.textContent = "Story Topic: " + topic;
+  storyResult.appendChild(title);
+
+  const info = document.createElement("p");
+  info.textContent =
+    "Duration: " + duration + " seconds | Style: " + style;
+  storyResult.appendChild(info);
+
+  selectedScenes.forEach((scene, index) => {
+    const card = document.createElement("div");
+    card.style.cssText =
+      "padding:12px;margin:12px 0;background:#151d30;border:1px solid #35425e;border-radius:10px;";
+
+    const heading = document.createElement("h3");
+    heading.textContent = "Scene " + (index + 1);
+
+    const narration = document.createElement("p");
+    narration.textContent = scene;
+
+    const prompt = document.createElement("p");
+    prompt.textContent =
+      "Visual Prompt: " + topic +
+      ", " + style +
+      ", funny expressions, colorful animation, cinematic scene " +
+      (index + 1);
+
+    card.appendChild(heading);
+    card.appendChild(narration);
+    card.appendChild(prompt);
+
+    storyResult.appendChild(card);
+  });
+
+});
+</script>
+</body>
+</html>
