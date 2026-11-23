@@ -578,6 +578,7 @@ readyLabel.style.cssText =
 
 const readyCheckbox = document.createElement("input");
 readyCheckbox.type = "checkbox";
+    readyCheckbox.setAttribute("data-scene-ready", "true");
 readyCheckbox.style.cssText =
   "width:22px;height:22px;accent-color:#22c55e;";
 
@@ -601,6 +602,7 @@ function updateReadyUI() {
 readyCheckbox.addEventListener("change", function() {
   localStorage.setItem(readyKey, String(readyCheckbox.checked));
   updateReadyUI();
+  updateSceneProgress();
 });
 
 updateReadyUI();
@@ -701,6 +703,7 @@ card.appendChild(imageCreatorBtn);
     storyResult.appendChild(card);
   });
 updateTotalVideoDuration();
+  updateSceneProgress();
 });
 </script>
   <script>
