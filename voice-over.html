@@ -339,18 +339,10 @@ function previewVoice() {
     return;
   }
 
-  const preference = genderSelect.value;
-  const detected = detectGender(selectedVoice);
-
-  if (preference !== "any" && detected !== preference) {
-    statusText.textContent =
-      "Selected voice gender could not be verified. Please choose another voice.";
-    return;
-  }
-
   speechSynthesis.cancel();
 
   const utterance = new SpeechSynthesisUtterance(text);
+
   utterance.voice = selectedVoice;
   utterance.lang = selectedVoice.lang;
   utterance.rate = Number(speedSelect.value);
@@ -365,9 +357,10 @@ function previewVoice() {
   };
 
   utterance.onerror = function(event) {
-    statusText.textContent = "Voice preview error: " + event.error;
+    statusText.textContent = "Voice error: " + event.error;
   };
 
+  speechSynthesis.resume();
   speechSynthesis.speak(utterance);
 }
 
