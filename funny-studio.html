@@ -578,6 +578,26 @@ readyLabel.style.cssText =
 
 const readyCheckbox = document.createElement("input");
 readyCheckbox.type = "checkbox";
+    const statusSelect = document.createElement("select");
+statusSelect.innerHTML = `
+  <option value="pending">📝 Pending</option>
+  <option value="progress">🛠️ In Progress</option>
+  <option value="completed">✅ Completed</option>
+`;
+statusSelect.style.width = "100%";
+statusSelect.style.padding = "10px";
+statusSelect.style.margin = "10px 0";
+statusSelect.style.borderRadius = "8px";
+const statusKey = "funnyStatus_" + topic + "_scene_" + (index + 1);
+
+// Purana saved status load karein
+statusSelect.value = localStorage.getItem(statusKey) || "pending";
+
+// Status change hone par save karein
+statusSelect.addEventListener("change", function() {
+  localStorage.setItem(statusKey, statusSelect.value);
+});
+readyBox.appendChild(statusSelect);
     readyCheckbox.setAttribute("data-scene-ready", "true");
 readyCheckbox.style.cssText =
   "width:22px;height:22px;accent-color:#22c55e;";
