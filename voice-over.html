@@ -199,6 +199,7 @@ footer {
 </div>
 
 <script>
+
 const textInput = document.getElementById("voiceText");
 const languageSelect = document.getElementById("language");
 const genderSelect = document.getElementById("gender");
@@ -211,41 +212,103 @@ const voiceInfo = document.getElementById("voiceInfo");
 
 let availableVoices = [];
 
+function detectGender(voice) {
+  const name = voice.name.toLowerCase();
+
+  const maleNames =
+    /\b(david|mark|guy|james|daniel|alex|tom|richard|aaron|fred|male)\b/;
+
+  const femaleNames =
+    /\b(zira|samantha|victoria|karen|susan|female|jenny|aria|ava|sara)\b/;
+
+  if (maleNames.test(name)) return "male";
+  if (femaleNames.test(name)) return "female";
+
+  return "unknown";
+}
+
 function loadVoices() {
   if (!("speechSynthesis" in window)) {
     voiceSelect.innerHTML = '<option value="">Not supported</option>';
-    statusText.textContent = "Speech voices are not supported in this browser.";
+    statusText.textContent = "Speech voices are not supported.";
     return;
   }
 
   availableVoices = speechSynthesis.getVoices();
-
   voiceSelect.innerHTML = "";
 
-  if (availableVoices.length === 0) {
-    voiceSelect.innerHTML = '<option value="">No voices found yet</option>';
+  if (!availableVoices.length) {
+    voiceSelect.innerHTML = '<option value="">No voices found</option>';
     return;
   }
 
   availableVoices.forEach((voice, index) => {
     const option = document.createElement("option");
     option.value = index;
-    option.textContent = voice.name + " (" + voice.lang + ")";
+
+    const gender = detectGender(voice);
+    const label = gender === "unknown"
+      ? "Gender unknown"
+      : gender.toUpperCase();
+
+    option.textContent =
+      voice.name + " (" + voice.lang + ") — " + label;
+
     voiceSelect.appendChild(option);
   });
 
-  updateVoiceInfo();
+  choosePreferredVoice();
+}
+
+function choosePreferredVoice() {
+  const preference = genderSelect.value;
+  const language = getLanguageCode();
+
+  let candidates = availableVoices
+    .map((voice, index) => ({ voice, index }))
+    .filter(item =>
+      item.voice.lang.toLowerCase().startsWith(language.toLowerCase())
+    );
+
+  if (preference !== "any") {
+    const matching = candidates.filter(
+      item => detectGender(item.voice) === preference
+    );
+
+    if (!matching.length) {
+      voiceInfo.textContent =
+        "No clearly identified " + preference +
+        " voice found. Device voice names do not reveal gender.";
+
+      statusText.textContent =
+        "Please choose another voice. Gender could not be identified.";
+
+      return;
+    }
+
+    candidates = matching;
+  }
+
+  if (candidates.length) {
+    voiceSelect.value = String(candidates[0].index);
+    updateVoiceInfo();
+  }
 }
 
 function updateVoiceInfo() {
   const selected = availableVoices[Number(voiceSelect.value)];
 
-  if (selected) {
-    voiceInfo.textContent =
-      "Selected device voice: " + selected.name + " — " + selected.lang;
-  } else {
-    voiceInfo.textContent = "";
+  if (!selected) {
+    voiceInfo.textContent = "No voice selected.";
+    return;
   }
+
+  const gender = detectGender(selected);
+
+  voiceInfo.textContent =
+    "Selected: " + selected.name +
+    " — " + selected.lang +
+    " — " + gender;
 }
 
 function getLanguageCode() {
@@ -265,20 +328,31 @@ function previewVoice() {
   }
 
   if (!("speechSynthesis" in window)) {
-    statusText.textContent = "Your browser does not support speech voices.";
+    statusText.textContent = "Speech voices are not supported.";
+    return;
+  }
+
+  const selectedVoice = availableVoices[Number(voiceSelect.value)];
+
+  if (!selectedVoice) {
+    statusText.textContent = "Please select an available voice.";
+    return;
+  }
+
+  const preference = genderSelect.value;
+  const detected = detectGender(selectedVoice);
+
+  if (preference !== "any" && detected !== preference) {
+    statusText.textContent =
+      "Selected voice gender could not be verified. Please choose another voice.";
     return;
   }
 
   speechSynthesis.cancel();
 
   const utterance = new SpeechSynthesisUtterance(text);
-  const selectedVoice = availableVoices[Number(voiceSelect.value)];
-
-  if (selectedVoice) {
-    utterance.voice = selectedVoice;
-  }
-
-  utterance.lang = getLanguageCode();
+  utterance.voice = selectedVoice;
+  utterance.lang = selectedVoice.lang;
   utterance.rate = Number(speedSelect.value);
   utterance.pitch = Number(pitchSelect.value);
 
@@ -304,15 +378,23 @@ function stopVoice() {
   }
 }
 
-document.getElementById("previewBtn").addEventListener("click", previewVoice);
-document.getElementById("stopBtn").addEventListener("click", stopVoice);
+document.getElementById("previewBtn")
+  .addEventListener("click", previewVoice);
+
+document.getElementById("stopBtn")
+  .addEventListener("click", stopVoice);
 
 voiceSelect.addEventListener("change", updateVoiceInfo);
+
+genderSelect.addEventListener("change", choosePreferredVoice);
+
+languageSelect.addEventListener("change", choosePreferredVoice);
 
 if ("speechSynthesis" in window) {
   loadVoices();
   speechSynthesis.onvoiceschanged = loadVoices;
 }
+
 
 </script>
 </body>
